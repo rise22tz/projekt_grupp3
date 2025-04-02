@@ -1,4 +1,3 @@
-# projekt_grupp3
+# Learn Terraform vSphere
 
-
-Very nice!
+This repo is a companion repo to the [Manage VMs and Snapshots on vSphere](https://learn.hashicorp.com/tutorials/terraform/vsphere-provider?utm_source=WEBSITE&utm_medium=GITHUB)  learn guide.
