@@ -1,8 +1,0 @@
-vsphere_server     = "vcsa.virt.local"
-vsphere_user       = "administrator@vsphere.local"
-vsphere_password   = "Cisco123!"
-datacenter         = "Datacenter"
-datastore          = "Datastore1"
-cluster            = "Cluster"
-network_name       = "Servers"
-ubuntu_name        = "ubuntu"
