@@ -18,7 +18,7 @@ source "vsphere-iso" "this" {
   cluster             = var.cluster
   insecure_connection = true
 
-  vm_name       = "tf-edu-ubuntu"
+  vm_name       = "ubuntu"
   guest_os_type = "ubuntu64Guest"
 
   CPUs            = 2
