@@ -25,7 +25,7 @@ data "vsphere_compute_cluster" "cluster" {
 
 data "vsphere_virtual_machine" "template" {
   # VM som används som template och blir klonad
-  name          = "jammy-server-cloudimg-amd64"
+  name          = var.ubuntu_name
   datacenter_id = data.vsphere_datacenter.datacenter.id
 }
 
