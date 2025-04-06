@@ -76,6 +76,7 @@ resource "vsphere_virtual_machine" "vm" {
       linux_options {
         host_name = "test"
         domain    = "virt.local"
+        
 
       }
     }
