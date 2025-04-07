@@ -31,13 +31,11 @@ data "vsphere_virtual_machine" "template" {
 }
 
 data "vsphere_network" "dmz" {
-  # Nätverk för VM, skrivs i tfvars
   name          = "DMZ"
   datacenter_id = data.vsphere_datacenter.datacenter.id
 }
 
 data "vsphere_network" "mgmt" {
-  # Nätverk för VM, skrivs i tfvars
   name          = "Management VMs"
   datacenter_id = data.vsphere_datacenter.datacenter.id
 }
