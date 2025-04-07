@@ -4,6 +4,7 @@ provider "vsphere" {
   vsphere_server       = var.vsphere_server
   allow_unverified_ssl = true
 
+
 }
 
 data "vsphere_datacenter" "datacenter" {
@@ -29,14 +30,141 @@ data "vsphere_virtual_machine" "template" {
   datacenter_id = data.vsphere_datacenter.datacenter.id
 }
 
-data "vsphere_network" "network" {
+data "vsphere_network" "dmz" {
   # Nätverk för VM, skrivs i tfvars
-  name          = var.network_name
+  name          = "DMZ"
   datacenter_id = data.vsphere_datacenter.datacenter.id
 }
 
-module "vpn" {
-  source = "./modules/vpn"
-  
-  
+data "vsphere_network" "mgmt" {
+  # Nätverk för VM, skrivs i tfvars
+  name          = "Management VMs"
+  datacenter_id = data.vsphere_datacenter.datacenter.id
+}
+
+resource "vsphere_folder" "vpn" {
+  path          = "VPN"
+  type          = "vm"
+  datacenter_id = data.vsphere_datacenter.datacenter.id
+}
+
+resource "vsphere_folder" "runner" {
+  path          = "Runners"
+  type          = "vm"
+  datacenter_id = data.vsphere_datacenter.datacenter.id
+}
+
+# VPN
+resource "vsphere_virtual_machine" "vpn" {
+  count            = 2
+  name             = "vpn-${count.index + 1}"
+  resource_pool_id = data.vsphere_compute_cluster.cluster.resource_pool_id
+  datastore_id     = data.vsphere_datastore.datastore.id
+  num_cpus         = 1
+  memory           = 1024
+  folder           = vsphere_folder.vpn.path
+  network_interface {
+    network_id = data.vsphere_network.dmz.id
+  }
+  disk {
+    label            = "Hard Disk 1"
+    size             = 16
+    thin_provisioned = false
+  }
+
+  cdrom {
+    client_device = true
+  }
+
+  vapp {
+    properties = {
+      "hostname"    = "vpn-${count.index + 1}"
+      "public-keys" = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKCnq5ZGGA2Fa17jaWNrBdcvWfhVqUqi6xTksaXJSDvM"
+      "instance-id" = "vpn-${count.index + 1}"
+
+    }
+  }
+  # Måste vara där
+  guest_id = "ubuntu64Guest"
+
+  clone {
+    # Referens till templaten som deklarerades tidigare
+    template_uuid = data.vsphere_virtual_machine.template.id
+    customize {
+
+      network_interface {
+        ipv4_address = "10.200.200.${count.index + 1}"
+        ipv4_netmask = "24"
+
+      }
+
+      ipv4_gateway    = "10.200.200.254"
+      dns_server_list = ["10.200.200.254"]
+      dns_suffix_list = ["virt.local"]
+
+      linux_options {
+        host_name = "vpn-${count.index + 1}"
+        domain    = "virt.local"
+
+
+      }
+    }
+  }
+}
+
+# Runners
+resource "vsphere_virtual_machine" "runner" {
+  count            = 2
+  name             = "runner-${count.index + 1}"
+  resource_pool_id = data.vsphere_compute_cluster.cluster.resource_pool_id
+  datastore_id     = data.vsphere_datastore.datastore.id
+  num_cpus         = 1
+  memory           = 1024
+  folder           = vsphere_folder.runner.path
+  network_interface {
+    network_id = data.vsphere_network.mgmt.id
+  }
+  disk {
+    label            = "Hard Disk 1"
+    size             = 16
+    thin_provisioned = false
+  }
+
+  cdrom {
+    client_device = true
+  }
+  vapp {
+    properties = {
+      "hostname"    = "runner-${count.index + 1}"
+      "public-keys" = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKCnq5ZGGA2Fa17jaWNrBdcvWfhVqUqi6xTksaXJSDvM"
+      "instance-id" = "runner-${count.index + 1}"
+    }
+  }
+
+  # Måste vara där
+  guest_id = "ubuntu64Guest"
+
+  clone {
+    # Referens till templaten som deklarerades tidigare
+    template_uuid = data.vsphere_virtual_machine.template.id
+    customize {
+
+      network_interface {
+        ipv4_address = "10.200.100.5${count.index + 1}"
+        ipv4_netmask = "24"
+
+      }
+
+      ipv4_gateway    = "10.200.100.1"
+      dns_server_list = ["10.200.100.1"]
+      dns_suffix_list = ["virt.local"]
+
+      linux_options {
+        host_name = "runner-${count.index + 1}"
+        domain    = "virt.local"
+
+
+      }
+    }
+  }
 }
