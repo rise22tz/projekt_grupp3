@@ -31,9 +31,3 @@ variable "datastore" {
   description = "vSphere datastore"
   type        = string
 }
-
-
-variable "ubuntu_name" {
-  description = "Ubuntu name (ie: image_path)"
-  type        = string
-}
