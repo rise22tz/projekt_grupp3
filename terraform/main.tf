@@ -4,6 +4,7 @@ provider "vsphere" {
   vsphere_server       = var.vsphere_server
   allow_unverified_ssl = true
 
+
 }
 
 data "vsphere_datacenter" "datacenter" {
@@ -25,21 +26,6 @@ data "vsphere_compute_cluster" "cluster" {
 
 data "vsphere_virtual_machine" "template" {
   # VM som används som template och blir klonad
-<<<<<<< HEAD
-  name          = var.ubuntu_name
-  datacenter_id = data.vsphere_datacenter.datacenter.id
-}
-
-data "vsphere_network" "network" {
-  # Nätverk för VM, skrivs i tfvars
-  name          = var.network_name
-  datacenter_id = data.vsphere_datacenter.datacenter.id
-}
-
-
-resource "vsphere_virtual_machine" "vm" {
-  name             = "terraform-test"
-=======
   name          = "jammy-server-cloudimg-amd64"
   datacenter_id = data.vsphere_datacenter.datacenter.id
 }
@@ -76,36 +62,24 @@ resource "vsphere_folder" "dns" {
 resource "vsphere_virtual_machine" "vpn" {
   count            = 2
   name             = "vpn-${count.index + 1}"
->>>>>>> dev
   resource_pool_id = data.vsphere_compute_cluster.cluster.resource_pool_id
   datastore_id     = data.vsphere_datastore.datastore.id
   num_cpus         = 1
   memory           = 1024
-<<<<<<< HEAD
-  network_interface {
-    network_id = data.vsphere_network.network.id
-=======
   folder           = vsphere_folder.vpn.path
   network_interface {
     network_id = data.vsphere_network.dmz.id
->>>>>>> dev
   }
   disk {
     label            = "Hard Disk 1"
     size             = 16
-<<<<<<< HEAD
-    thin_provisioned = true
-=======
     thin_provisioned = false
->>>>>>> dev
   }
 
   cdrom {
     client_device = true
   }
 
-<<<<<<< HEAD
-=======
   vapp {
     properties = {
       "hostname"    = "vpn-${count.index + 1}"
@@ -171,7 +145,6 @@ resource "vsphere_virtual_machine" "runner" {
     }
   }
 
->>>>>>> dev
   # Måste vara där
   guest_id = "ubuntu64Guest"
 
@@ -181,25 +154,11 @@ resource "vsphere_virtual_machine" "runner" {
     customize {
 
       network_interface {
-<<<<<<< HEAD
-        ipv4_address = "10.200.50.220"
-=======
         ipv4_address = "10.200.100.5${count.index + 1}"
->>>>>>> dev
         ipv4_netmask = "24"
 
       }
 
-<<<<<<< HEAD
-      ipv4_gateway    = "10.200.50.1"
-      dns_server_list = ["10.200.50.1"]
-      dns_suffix_list = ["virt.local"]
-
-      linux_options {
-        host_name = "test"
-        domain    = "virt.local"
-
-=======
       ipv4_gateway    = "10.200.100.1"
       dns_server_list = ["10.200.100.1"]
       dns_suffix_list = ["virt.local"]
@@ -265,7 +224,6 @@ resource "vsphere_virtual_machine" "nameserver" {
         host_name = "ns-${count.index + 1}"
         domain    = "virt.local"
 
->>>>>>> dev
 
       }
     }
