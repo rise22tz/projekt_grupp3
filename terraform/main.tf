@@ -4,10 +4,6 @@ provider "vsphere" {
   vsphere_server       = var.vsphere_server
   allow_unverified_ssl = true
 
-<<<<<<< HEAD
-=======
-
->>>>>>> dev
 }
 
 data "vsphere_datacenter" "datacenter" {
@@ -202,7 +198,7 @@ resource "vsphere_virtual_machine" "runner" {
       linux_options {
         host_name = "test"
         domain    = "virt.local"
-        
+
 =======
       ipv4_gateway    = "10.200.100.1"
       dns_server_list = ["10.200.100.1"]
