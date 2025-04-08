@@ -1,0 +1,11 @@
+- name: Update all hosts & reboot
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Check for updates and install
+      ansible.builtin.apt:
+        update_cache: true
+        upgrade: true
+        autoremove: true
