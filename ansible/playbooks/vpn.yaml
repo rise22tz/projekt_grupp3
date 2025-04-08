@@ -17,3 +17,9 @@
         owner: root
         group: root
         backup: true
+
+    - name: Enable and start WireGuard service
+      ansible.builtin.systemd:
+        name: wg-quick@wg0.service
+        state: started
+        enabled: true

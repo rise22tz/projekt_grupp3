@@ -17,3 +17,9 @@
         owner: root
         group: root
         backup: true
+
+    - name: Enable and start Bind9 service
+      ansible.builtin.systemd:
+        name: bind9.service
+        state: started
+        enabled: true
