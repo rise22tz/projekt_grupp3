@@ -1,0 +1,19 @@
+- name: Install and configure WireGuard
+  hosts: vpn
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Install wireguard
+      ansible.builtin.apt:
+        name: wireguard-tools
+        state: present
+
+    - name: Create WireGuard configuration
+      ansible.builtin.copy:
+        src: ../config/wireguard.conf
+        dest: /etc/wireguard/wg0.conf
+        mode: '0600'
+        owner: root
+        group: root
+        backup: true
