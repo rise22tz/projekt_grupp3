@@ -361,22 +361,25 @@ resource "vsphere_virtual_machine" "ntp" {
   }
 }
 
-resource "vsphere_compute_cluster_vm_anti_affinity_rule" "rec_dns_anti_affinity_rule" {
-  name                = "rec_dns_anti-affinity-rule"
-  compute_cluster_id  = data.vsphere_compute_cluster.cluster.id
-  virtual_machine_ids = [for k, v in vsphere_virtual_machine.recursive-nameserver : v.id]
 
-  lifecycle {
-    replace_triggered_by = [vsphere_virtual_machine.recursive-nameserver]
+locals {
+  vm_groups = {
+    vpn                  = vsphere_virtual_machine.vpn,
+    runner               = vsphere_virtual_machine.runner,
+    nameserver           = vsphere_virtual_machine.nameserver,
+    recursive_nameserver = vsphere_virtual_machine.recursive-nameserver,
+    ntp                  = vsphere_virtual_machine.ntp
   }
 }
 
-resource "vsphere_compute_cluster_vm_anti_affinity_rule" "ntp_anti_affinity_rule" {
-  name                = "ntp_anti-affinity-rule"
-  compute_cluster_id  = data.vsphere_compute_cluster.cluster.id
-  virtual_machine_ids = [for k, v in vsphere_virtual_machine.ntp : v.id]
+resource "vsphere_compute_cluster_vm_anti_affinity_rule" "all_vms_anti_affinity_rule" {
+  for_each           = local.vm_groups
+  name               = "anti-affinity-rule-${each.key}"
+  compute_cluster_id = data.vsphere_compute_cluster.cluster.id
+
+  virtual_machine_ids = [for vm in each.value : vm.id]
 
   lifecycle {
-    replace_triggered_by = [vsphere_virtual_machine.ntp]
+    ignore_changes = [virtual_machine_ids]
   }
 }
