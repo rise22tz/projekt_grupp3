@@ -4,6 +4,13 @@
   gather_facts: false
 
   tasks:
+    - name: Enable IP forwarding
+      ansible.builtin.sysctl:
+        name: net.ipv4.ip_forward
+        value: 1
+        state: present
+        reload: yes
+
     - name: Install wireguard
       ansible.builtin.apt:
         name: wireguard-tools
@@ -11,15 +18,21 @@
 
     - name: Create WireGuard configuration
       ansible.builtin.copy:
-        src: ../config/wireguard.conf
+        src: ../config/wireguard/wg0.conf
         dest: /etc/wireguard/wg0.conf
         mode: '0600'
         owner: root
         group: root
         backup: true
+        force: true
 
     - name: Enable and start WireGuard service
       ansible.builtin.systemd:
         name: wg-quick@wg0.service
         state: started
         enabled: true
+
+    - name: Restart WireGuard service
+      ansible.builtin.systemd:
+        name: wg-quick@wg0.service
+        state: restarted

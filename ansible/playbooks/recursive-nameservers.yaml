@@ -18,6 +18,22 @@
         group: root
         backup: true
 
+    - name: Disable systemd-resolved
+      ansible.builtin.systemd:
+        name: systemd-resolved
+        state: stopped
+        enabled: false
+
+
+    - name: Change resolv.conf
+      ansible.builtin.lineinfile:
+        path: /etc/resolv.conf
+        regexp: '^nameserver 127.0.0.53'
+        line: 'nameserver 127.0.0.1'
+        state: present
+        backup: true
+
+
     - name: Enable and start Unbound service
       ansible.builtin.systemd:
         name: unbound.service

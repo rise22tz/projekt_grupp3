@@ -10,6 +10,7 @@
         state: present
 
     - name: Upload named.conf.local
+      host: ns-master
       ansible.builtin.copy:
         src: ../config/named.conf
         dest: /etc/bind/named.conf

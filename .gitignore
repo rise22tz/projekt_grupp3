@@ -41,5 +41,9 @@ terraform.rc
 
 
 # Ansible
+.ansible
 
-.Ansible
+# Protect wireguard private keys
+wg0.conf
+
+wireguard/
