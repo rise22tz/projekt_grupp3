@@ -1,5 +1,5 @@
 - name: Change DNS settings
-  hosts: ntp
+  hosts: vpn
   become: true
   gather_facts: false
 
@@ -14,6 +14,3 @@
               - 10.200.50.12
         insertafter: "addresses:"
         mode: '0600'
-
-    - name: Apply Netplan configuration
-      ansible.builtin.command: netplan apply
