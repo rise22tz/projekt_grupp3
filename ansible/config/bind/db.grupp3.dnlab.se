@@ -1,0 +1,37 @@
+;
+; BIND data file for local loopback interface
+;
+$TTL	3600
+$ORIGIN grupp3.dnlab.se.	; base domain-name
+@	IN	SOA	ns1.grupp3.dnlab.se. root.localhost. (
+			      16	; Serial
+			 604800		; Refresh
+			  86400		; Retry
+			2419200		; Expire
+			 604800 )	; Negative Cache TTL
+;
+@	IN	NS	ns1.grupp3.dnlab.se.
+@	IN	NS	ns2.grupp3.dnlab.se.
+@	IN	TXT	"yolo"
+ns1	IN	A	193.10.29.51
+ns2	IN	A	193.10.29.52
+
+vpn	IN	A	193.10.29.53
+vpn	IN	A	193.10.29.54
+
+vpn1	IN	A	193.10.29.53
+vpn2	IN	A	193.10.29.54
+
+@	IN	A	193.10.29.48
+_dmarc	IN	TXT	"_dmarc=DMARC1; p=none; rua=mailto:support@grupp3.dnlab.se;"
+@	IN	TXT	"v=spf1 -all"
+www	IN	CNAME	grupp3.dnlab.se.
+@	IN	CAA	0 issue "letsencrypt.org"
+
+; Delegation for ad.grupp3.dnlab.se
+ad      IN NS   dc01.ad.grupp3.dnlab.se.
+ad      IN NS   dc02.ad.grupp3.dnlab.se.
+
+; Glue records (needed if dc01 & dc02 are within ad.grupp3.dnlab.se)
+dc01.ad IN A 10.200.50.61
+dc02.ad IN A 10.200.50.62

@@ -1,0 +1,22 @@
+- name: Install and configure NTP
+  hosts: ntp
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Install NTP
+      ansible.builtin.apt:
+        name: chrony
+        state: present
+
+    - name: Configure NTP
+      ansible.builtin.copy:
+        src: ../config/chrony.conf
+        dest: /etc/chrony/chrony.conf
+        mode: '0600'
+
+    - name: Restart NTP
+      ansible.builtin.service:
+        name: chronyd
+        state: restarted
+        enabled: true

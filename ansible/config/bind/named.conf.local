@@ -1,0 +1,15 @@
+//
+// Do any local configuration here
+//
+
+zone "grupp3.dnlab.se" {
+	type master;
+	file "/etc/bind/db.grupp3.dnlab.se";
+	allow-transfer { 193.10.29.52; 10.200.200.254; };
+	notify yes;
+};
+
+// Consider adding the 1918 zones here, if they are not used in your
+// organization
+//include "/etc/bind/zones.rfc1918";
+

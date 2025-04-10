@@ -1,0 +1,32 @@
+# Server
+[Interface]
+# Name = vpn.grupp3.dnlab.se
+Address = 10.250.96.254/24
+ListenPort = 51820
+PrivateKey = 2P/3ll/TxGTjGqwcWnqJMnjwPqGw7oX1RaXlPfsf2FQ=
+
+# Clients
+[Peer]
+# Name = Client1
+PublicKey = BV5DjXeCugIrjvEZLo4sZ0hN5wveFTH8kOfZ1AIQ5js=
+AllowedIPs = 10.250.96.1/32
+
+[Peer]
+# Name = Client2
+PublicKey = BV5DjXeCugIrjvEZLo4sZ0hN5wveFTH8kOfZ1AIQ5js=
+AllowedIPs = 10.250.96.2/32
+
+[Peer]
+# Name = Client3
+PublicKey = BV5DjXeCugIrjvEZLo4sZ0hN5wveFTH8kOfZ1AIQ5js=
+AllowedIPs = 10.250.96.3/32
+
+[Peer]
+# Name = Client4
+PublicKey = BV5DjXeCugIrjvEZLo4sZ0hN5wveFTH8kOfZ1AIQ5js=
+AllowedIPs = 10.250.96.4/32
+
+[Peer]
+# Name = Client5
+PublicKey = BV5DjXeCugIrjvEZLo4sZ0hN5wveFTH8kOfZ1AIQ5js=
+AllowedIPs = 10.250.96.5/32
