@@ -47,3 +47,7 @@ terraform.rc
 wg0.conf
 
 wireguard/
+
+# idk mac shit
+
+.DS_Store
