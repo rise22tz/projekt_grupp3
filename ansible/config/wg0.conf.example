@@ -1,32 +1,20 @@
 # Server
 [Interface]
 # Name = vpn.grupp3.dnlab.se
-Address = 10.250.96.254/24
+Address = 10.250.0.254/24
 ListenPort = 51820
-PrivateKey = 2P/3ll/TxGTjGqwcWnqJMnjwPqGw7oX1RaXlPfsf2FQ=
+PrivateKey = <redacted>
+PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o ens192 -j MASQUERADE
+PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o ens192 -j MASQUERADE
+
 
 # Clients
 [Peer]
 # Name = Client1
-PublicKey = BV5DjXeCugIrjvEZLo4sZ0hN5wveFTH8kOfZ1AIQ5js=
-AllowedIPs = 10.250.96.1/32
+PublicKey = <redacted>
+AllowedIPs = 10.250.0.1/32
 
 [Peer]
 # Name = Client2
-PublicKey = BV5DjXeCugIrjvEZLo4sZ0hN5wveFTH8kOfZ1AIQ5js=
-AllowedIPs = 10.250.96.2/32
-
-[Peer]
-# Name = Client3
-PublicKey = BV5DjXeCugIrjvEZLo4sZ0hN5wveFTH8kOfZ1AIQ5js=
-AllowedIPs = 10.250.96.3/32
-
-[Peer]
-# Name = Client4
-PublicKey = BV5DjXeCugIrjvEZLo4sZ0hN5wveFTH8kOfZ1AIQ5js=
-AllowedIPs = 10.250.96.4/32
-
-[Peer]
-# Name = Client5
-PublicKey = BV5DjXeCugIrjvEZLo4sZ0hN5wveFTH8kOfZ1AIQ5js=
-AllowedIPs = 10.250.96.5/32
+PublicKey = <redacted>
+AllowedIPs = 10.250.0.2/32
