@@ -645,7 +645,7 @@ resource "vsphere_virtual_machine" "test-ad" {
       dns_suffix_list = ["lan.grupp3.dnlab.se"]
 
       linux_options {
-        host_name = "test-ad--${count.index + 1}"
+        host_name = "test-ad-${count.index + 1}"
         domain    = "lan.grupp3.dnlab.se"
 
 
