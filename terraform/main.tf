@@ -75,6 +75,19 @@ resource "vsphere_folder" "ntp" {
   datacenter_id = data.vsphere_datacenter.datacenter.id
 }
 
+resource "vsphere_folder" "web" {
+  path          = "WEB"
+  type          = "vm"
+  datacenter_id = data.vsphere_datacenter.datacenter.id
+}
+resource "vsphere_folder" "mail" {
+  path          = "Mail"
+  type          = "vm"
+  datacenter_id = data.vsphere_datacenter.datacenter.id
+}
+
+
+
 # VPN
 resource "vsphere_virtual_machine" "vpn" {
   count            = 2
@@ -352,8 +365,8 @@ resource "vsphere_virtual_machine" "ntp" {
       dns_suffix_list = ["lan.grupp3.dnlab.se"]
 
       linux_options {
-        host_name = "ntp-${count.index + 1}"
-        domain    = "virt.local"
+        host_name = "ntp${count.index + 1}"
+        domain    = "lan.grupp3.dnlab.se"
 
 
       }
@@ -419,6 +432,173 @@ resource "vsphere_virtual_machine" "radius" {
   }
 }
 
+resource "vsphere_virtual_machine" "web" {
+  count            = 2
+  name             = "web-${count.index + 1}"
+  resource_pool_id = data.vsphere_compute_cluster.cluster.resource_pool_id
+  datastore_id     = count.index % 2 == 0 ? data.vsphere_datastore.datastore1.id : data.vsphere_datastore.datastore2.id
+  num_cpus         = 1
+  memory           = 1024
+  folder           = vsphere_folder.web.path
+  network_interface {
+    network_id = data.vsphere_network.dmz.id
+  }
+  disk {
+    label            = "Hard Disk 1"
+    size             = 16
+    thin_provisioned = false
+  }
+
+  cdrom {
+    client_device = true
+  }
+  vapp {
+    properties = {
+      "hostname"    = "web-${count.index + 1}"
+      "public-keys" = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKCnq5ZGGA2Fa17jaWNrBdcvWfhVqUqi6xTksaXJSDvM"
+      "instance-id" = "web-${count.index + 1}"
+    }
+  }
+
+  # Måste vara där
+  guest_id = "ubuntu64Guest"
+
+  clone {
+    # Referens till templaten som deklarerades tidigare
+    template_uuid = data.vsphere_virtual_machine.template.id
+    customize {
+
+      network_interface {
+        ipv4_address = "10.200.200.2${count.index + 1}"
+        ipv4_netmask = "24"
+
+      }
+
+      ipv4_gateway    = "10.200.200.254"
+      dns_server_list = ["10.200.200.254"]
+      dns_suffix_list = ["grupp3.dnlab.se"]
+
+      linux_options {
+        host_name = "web-${count.index + 1}"
+        domain    = "grupp3.dnlab.se"
+
+
+      }
+    }
+  }
+}
+
+resource "vsphere_virtual_machine" "mail" {
+  count            = 2
+  name             = "mx-${count.index + 1}"
+  resource_pool_id = data.vsphere_compute_cluster.cluster.resource_pool_id
+  datastore_id     = count.index % 2 == 0 ? data.vsphere_datastore.datastore1.id : data.vsphere_datastore.datastore2.id
+  num_cpus         = 2
+  memory           = 12228
+  folder           = vsphere_folder.mail.path
+  network_interface {
+    network_id = data.vsphere_network.dmz.id
+  }
+  disk {
+    label            = "Hard Disk 1"
+    size             = 16
+    thin_provisioned = false
+  }
+
+  cdrom {
+    client_device = true
+  }
+  vapp {
+    properties = {
+      "hostname"    = "mx-${count.index + 1}"
+      "public-keys" = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKCnq5ZGGA2Fa17jaWNrBdcvWfhVqUqi6xTksaXJSDvM"
+      "instance-id" = "mx-${count.index + 1}"
+    }
+  }
+
+  # Måste vara där
+  guest_id = "ubuntu64Guest"
+
+  clone {
+    # Referens till templaten som deklarerades tidigare
+    template_uuid = data.vsphere_virtual_machine.template.id
+    customize {
+
+      network_interface {
+        ipv4_address = "10.200.200.3${count.index + 1}"
+        ipv4_netmask = "24"
+
+      }
+
+      ipv4_gateway    = "10.200.200.254"
+      dns_server_list = ["10.200.200.254"]
+      dns_suffix_list = ["grupp3.dnlab.se"]
+
+      linux_options {
+        host_name = "mx-${count.index + 1}"
+        domain    = "grupp3.dnlab.se"
+
+
+      }
+    }
+  }
+}
+
+resource "vsphere_virtual_machine" "proxy" {
+  count            = 2
+  name             = "proxy-${count.index + 1}"
+  resource_pool_id = data.vsphere_compute_cluster.cluster.resource_pool_id
+  datastore_id     = count.index % 2 == 0 ? data.vsphere_datastore.datastore1.id : data.vsphere_datastore.datastore2.id
+  num_cpus         = 1
+  memory           = 1024
+  folder           = vsphere_folder.web.path
+  network_interface {
+    network_id = data.vsphere_network.dmz.id
+  }
+  disk {
+    label            = "Hard Disk 1"
+    size             = 16
+    thin_provisioned = false
+  }
+
+  cdrom {
+    client_device = true
+  }
+  vapp {
+    properties = {
+      "hostname"    = "proxy-${count.index + 1}"
+      "public-keys" = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKCnq5ZGGA2Fa17jaWNrBdcvWfhVqUqi6xTksaXJSDvM"
+      "instance-id" = "proxy-${count.index + 1}"
+    }
+  }
+
+  # Måste vara där
+  guest_id = "ubuntu64Guest"
+
+  clone {
+    # Referens till templaten som deklarerades tidigare
+    template_uuid = data.vsphere_virtual_machine.template.id
+    customize {
+
+      network_interface {
+        ipv4_address = "10.200.200.2${count.index + 3}"
+        ipv4_netmask = "24"
+
+      }
+
+      ipv4_gateway    = "10.200.200.254"
+      dns_server_list = ["10.200.200.254"]
+      dns_suffix_list = ["grupp3.dnlab.se"]
+
+      linux_options {
+        host_name = "proxy-${count.index + 1}"
+        domain    = "grupp3.dnlab.se"
+
+
+      }
+    }
+  }
+}
 
 locals {
   vm_groups = {
@@ -427,6 +607,9 @@ locals {
     nameserver           = vsphere_virtual_machine.nameserver,
     recursive_nameserver = vsphere_virtual_machine.recursive-nameserver,
     ntp                  = vsphere_virtual_machine.ntp
+    web                  = vsphere_virtual_machine.web
+    mail                 = vsphere_virtual_machine.mail
+    proxy                = vsphere_virtual_machine.proxy
   }
 }
 

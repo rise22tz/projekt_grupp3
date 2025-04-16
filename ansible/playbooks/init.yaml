@@ -1,5 +1,5 @@
 - name: Update all hosts, initial config & reboot
-  hosts: all
+  hosts: proxy
   become: true
   gather_facts: false
 
