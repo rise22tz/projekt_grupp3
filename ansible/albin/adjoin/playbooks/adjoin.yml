@@ -2,7 +2,7 @@
   hosts: test
   gather_facts: true
   vars_files:
-    - /ansible/adjoin/secrets.yml
+    - /Users/skr/git/projekt_grupp3/ansible/albin/adjoin/secrets.yml
   vars:
     ansible_become: true
     ansible_become_method: sudo
@@ -45,7 +45,7 @@
 
     - name: Join Realm
       ansible.builtin.shell:
-        "echo {{ credentials['password'] }} | sudo realm join -v -U {{ credentials['username'] }} {{ domain_name }}"
+        "echo {{ credentials['password'] }} | sudo realm join -v -U {{ credentials['username'] }} {{ domain_name }}  --computer-ou=OU=Linux,OU=Burkar,DC=ad,DC=grupp3,DC=dnlab,DC=se"
       register: result
 
     - name: Print Realm Result
@@ -77,4 +77,3 @@
     - name: Allow Only {{ domain_group_allowed }} Login Ubuntu
       ansible.builtin.shell:
         "sudo realm permit -g {{ domain_group_allowed }}@{{ domain_name }}"
-
