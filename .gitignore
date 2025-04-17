@@ -51,3 +51,5 @@ wireguard/
 # idk mac shit
 
 .DS_Store
+
+secrets.yml

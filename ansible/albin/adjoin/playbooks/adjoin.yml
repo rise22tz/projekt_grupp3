@@ -1,0 +1,80 @@
+- name: Install necessary packages and join AD
+  hosts: test
+  gather_facts: true
+  vars_files:
+    - /ansible/adjoin/secrets.yml
+  vars:
+    ansible_become: true
+    ansible_become_method: sudo
+
+    credentials: {
+      'username': "{{ domain_admin_user }}",
+      'password': "{{ domain_admin_password }}",
+    }
+
+  tasks:
+    - name: Update cache
+      ansible.builtin.apt:
+        update_cache: true
+
+    - name: Install packages
+      ansible.builtin.apt:
+        name:
+          - realmd
+          - adcli
+          - sssd
+          - sssd-tools
+          - packagekit
+          - libnss-sss
+          - libpam-sss
+          - samba-common-bin
+          - oddjob
+          - oddjob-mkhomedir
+        state: present
+
+    - name: Change hostname
+      ansible.builtin.shell:
+        "sudo hostnamectl set-hostname {{ ansible_hostname }}.{{ domain_name }}"
+
+    - name: Modify hosts file
+      ansible.builtin.lineinfile:
+        dest: "/etc/hosts"
+        line: "127.0.1.1       {{ ansible_hostname }}.{{ domain_name }}"
+        state: present
+        backup: true
+
+    - name: Join Realm
+      ansible.builtin.shell:
+        "echo {{ credentials['password'] }} | sudo realm join -v -U {{ credentials['username'] }} {{ domain_name }}"
+      register: result
+
+    - name: Print Realm Result
+      ansible.builtin.debug: var=result.stdout_lines
+
+    - name: Activate Homedir Creation
+      ansible.builtin.shell:
+        "sudo pam-auth-update --enable mkhomedir"
+
+    - name: Modify SSDCONF Line 1
+      ansible.builtin.replace:
+        path: /etc/sssd/sssd.conf
+        regexp: 'use_fully_qualified_names = True'
+        replace: 'use_fully_qualified_names = False'
+
+    - name: Modify SSDCONF Line 2
+      ansible.builtin.replace:
+        path: /etc/sssd/sssd.conf
+        regexp: 'fallback_homedir = /home/%u@%d'
+        replace: 'fallback_homedir = /home/%u'
+
+    - name: Add {{ domain_group_allowed }} to Sudoers Ubuntu
+      ansible.builtin.lineinfile:
+        dest: "/etc/sudoers"
+        line: "%{{ domain_group_allowed }}   ALL=(ALL) NOPASSWD:ALL"
+        state: present
+        backup: true
+
+    - name: Allow Only {{ domain_group_allowed }} Login Ubuntu
+      ansible.builtin.shell:
+        "sudo realm permit -g {{ domain_group_allowed }}@{{ domain_name }}"
+
