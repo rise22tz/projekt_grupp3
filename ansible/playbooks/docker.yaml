@@ -1,5 +1,5 @@
 - name: Install Docker
-  hosts: mail
+  hosts: cloak
   become: yes
   vars:
     docker_group: docker
