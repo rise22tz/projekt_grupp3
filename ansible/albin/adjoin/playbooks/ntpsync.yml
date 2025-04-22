@@ -1,0 +1,26 @@
+- name: Sync with NTP servers
+  hosts: all:!ntp
+  gather_facts: false
+  vars:
+    ansible_become: true
+    ansible_become_method: sudo
+
+  tasks:
+    - name: Make sure chronyd is installed
+      ansible.builtin.apt:
+        name: chrony
+        state: present
+
+    - name: Deploy chrony.conf template
+      ansible.builtin.template:
+        src: /Users/skr/git/projekt_grupp3/ansible/config/chrony_client.conf
+        dest: /etc/chrony.conf
+        owner: root
+        group: root
+        mode: 0644
+        backup: true
+
+    - name: Restart chronyd
+      ansible.builtin.service:
+        name: chronyd
+        state: restarted
