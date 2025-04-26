@@ -1,5 +1,5 @@
 - name: Update all hosts, initial config & reboot
-  hosts: cloak
+  hosts: rancher
   become: true
   gather_facts: false
 
@@ -9,13 +9,13 @@
         update_cache: true
         upgrade: true
 
-    - name: Disable password authentication
-      ansible.builtin.lineinfile:
-        path: /etc/ssh/sshd_config
-        regexp: '^PasswordAuthentication'
-        line: 'PasswordAuthentication no'
-        state: present
-        backup: true
+    #- name: Disable password authentication
+    #  ansible.builtin.lineinfile:
+    #    path: /etc/ssh/sshd_config
+    #    regexp: '^PasswordAuthentication'
+    #    line: 'PasswordAuthentication no'
+    #    state: present
+    #    backup: true
 
     - name: Reboot the system
       ansible.builtin.reboot:

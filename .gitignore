@@ -52,4 +52,9 @@ wireguard/
 
 .DS_Store
 
-secrets.yml
+secrets.ymls
+secret.yaml
+secret.yml
+
+values-secret.yaml
+values-secret.yml

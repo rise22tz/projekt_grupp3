@@ -1,0 +1,197 @@
+# Default values for bookstack.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+# This will use the default deployment strategy unless it is overridden
+deploymentStrategy: {}
+
+image:
+  repository: solidnerd/bookstack
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "25.2"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a ServiceAccount should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the ServiceAccount to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# Set security context for bookstack pod
+securityContext:
+  fsGroup: 33 # www-data
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: traefik
+  annotations:
+    traefik.ingress.kubernetes.io/forwarded-headers: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    # kubernetes.io/tls-acme: "true"
+  path: /
+  hosts:
+    - docs.grupp3.dnlab.se
+  tls:
+    - secretName: docs-grupp3-dnlab-se-tls
+      hosts:
+        - docs.grupp3.dnlab.se
+
+resources:
+  {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+app:
+  # Laravel APP_KEY. Generate one with `php artisan key:generate` and put here if you want a static key.
+  key: ""
+  url: "https://docs.grupp3.dnlab.se"
+
+env:
+  LDAP_USER_TO_GROUPS: "true"
+  LDAP_GROUP_ATTRIBUTE: "memberOf"
+  LDAP_REMOVE_FROM_GROUPS: "false"
+
+##
+## External database configuration
+##
+externalDatabase:
+  ## Database host
+  host:
+
+  ## Database host
+  port: 3306
+
+  ## Database user
+  user: bookstack
+
+  ## Database password
+  password:
+
+  ## Database name
+  database: bookstack
+
+  ## TLS cert file to setup TLS connection with externalDatabase
+  ## tlsCert: <cert file content>
+
+##
+## MariaDB chart configuration
+##
+mariadb:
+  ## Whether to deploy a mariadb server to satisfy the applications database requirements. To use an external database set this to false and configure the externalDatabase parameters
+  enabled: true
+
+  ## Disable MariaDB replication
+  architecture: standalone
+
+  ## Create a database and a database user
+  ## ref: https://github.com/bitnami/bitnami-docker-mariadb/blob/master/README.md#creating-a-database-user-on-first-run
+  ##
+  auth:
+    database: bookstack
+    username: bookstack
+    ## If the password is not specified, mariadb will generates a random password
+    ##
+    password: ""
+
+    ## MariaDB admin password
+    ## ref: https://github.com/bitnami/bitnami-docker-mariadb/blob/master/README.md#setting-the-root-password-on-first-run
+    ##
+    # rootPassword:
+
+  ## Enable persistence using Persistent Volume Claims
+  ## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+  ##
+  primary:
+    persistence:
+      enabled: false
+      ## mariadb data Persistent Volume Storage Class
+      ## If defined, storageClassName: <storageClass>
+      ## If set to "-", storageClassName: "", which disables dynamic provisioning
+      ## If undefined (the default) or set to null, no storageClassName spec is
+      ##   set, choosing the default provisioner.  (gp2 on AWS, standard on GKE, AWS & OpenStack)
+      ##
+      #storageClass: "vsphere-csi-sc"
+      storageClass: "longhorn"
+      accessModes: [ReadWriteOnce]
+      size: 8Gi
+
+## For RBAC support:
+rbac:
+  # Specifies whether RBAC resources should be created
+  create: true
+
+## Enable persistence using Persistent Volume Claims
+## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+##
+persistence:
+  # Persistence for the public/uploads folder
+  uploads:
+    enabled: true
+    ## database data Persistent Volume Storage Class
+    ## If defined, storageClassName: <storageClass>
+    ## If set to "-", storageClassName: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClassName spec is
+    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    ##   GKE, AWS & OpenStack)
+    ##
+    #storageClass: "vsphere-csi-sc"
+    storageClass: "longhorn"
+    accessMode: ReadWriteOnce
+    size: 8Gi
+
+  # Persistence for the public/storage folder
+  storage:
+    enabled: true
+    ## database data Persistent Volume Storage Class
+    ## If defined, storageClassName: <storageClass>
+    ## If set to "-", storageClassName: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClassName spec is
+    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    ##   GKE, AWS & OpenStack)
+    ##
+    # storageClass: "-"
+    #storageClass: "vsphere-csi-sc"
+    storageClass: "longhorn"
+    accessMode: ReadWriteOnce
+    size: 8Gi
+## Enable ldap authentication. See https://www.bookstackapp.com/docs/admin/ldap-auth/ for details on how to set it up.
+ldap:
+  enabled: true
+  server: ad.grupp3.dnlab.se
+  base_dn: "CN=Users,DC=ad,DC=grupp3,DC=dnlab,DC=se"
+  dn: "CN=srv-bookstack,CN=Users,DC=ad,DC=grupp3,DC=dnlab,DC=se"
+  pass: ""
+  userFilter: (&(sAMAccountName={user}))
+  idAttribute: BIN;objectGUID
+  userToGroups: true
+  groupAttribute: "memberOf"
+  removeFromGroups: false
+  startTLS: false
+  version: 3
