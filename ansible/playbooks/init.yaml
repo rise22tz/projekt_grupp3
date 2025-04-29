@@ -1,5 +1,5 @@
 - name: Update all hosts, initial config & reboot
-  hosts: rancher
+  hosts: all
   become: true
   gather_facts: false
 

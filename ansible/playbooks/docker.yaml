@@ -1,5 +1,5 @@
 - name: Install Docker
-  hosts: rancher
+  hosts: all
   become: yes
   vars:
     docker_group: docker

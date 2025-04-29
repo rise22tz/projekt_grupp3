@@ -499,7 +499,7 @@ resource "vsphere_virtual_machine" "web" {
 }
 
 resource "vsphere_virtual_machine" "mail" {
-  count            = 2
+  count            = 1
   name             = "mx-${count.index + 1}"
   resource_pool_id = data.vsphere_compute_cluster.cluster.resource_pool_id
   datastore_id     = count.index % 2 == 0 ? data.vsphere_datastore.datastore1.id : data.vsphere_datastore.datastore2.id
@@ -768,6 +768,61 @@ resource "vsphere_virtual_machine" "rancher" {
 
       linux_options {
         host_name = "rancher-${count.index + 1}"
+        domain    = "grupp3.dnlab.se"
+
+
+      }
+    }
+  }
+}
+resource "vsphere_virtual_machine" "nfs" {
+  count            = 1
+  name             = "nfs-${count.index + 1}"
+  resource_pool_id = data.vsphere_compute_cluster.cluster.resource_pool_id
+  datastore_id     = count.index % 2 == 0 ? data.vsphere_datastore.datastore1.id : data.vsphere_datastore.datastore2.id
+  folder           = vsphere_folder.mgmt.path
+  num_cpus         = 2
+  memory           = 4096
+  network_interface {
+    network_id = data.vsphere_network.dmz.id
+  }
+  disk {
+    label            = "Hard Disk 1"
+    size             = 50
+    thin_provisioned = false
+  }
+
+  cdrom {
+    client_device = true
+  }
+  vapp {
+    properties = {
+      "hostname"    = "nfs-${count.index + 1}"
+      "public-keys" = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKCnq5ZGGA2Fa17jaWNrBdcvWfhVqUqi6xTksaXJSDvM"
+      "instance-id" = "nfs-${count.index + 1}"
+    }
+  }
+
+  # Måste vara där
+  guest_id = "ubuntu64Guest"
+
+  clone {
+    # Referens till templaten som deklarerades tidigare
+    template_uuid = data.vsphere_virtual_machine.template.id
+    customize {
+
+      network_interface {
+        ipv4_address = "10.200.200.19${count.index + 1}"
+        ipv4_netmask = "24"
+
+      }
+
+      ipv4_gateway    = "10.200.200.254"
+      dns_server_list = ["10.200.50.11", "10.200.50.12"]
+      dns_suffix_list = ["grupp3.dnlab.se"]
+
+      linux_options {
+        host_name = "nfs-${count.index + 1}"
         domain    = "grupp3.dnlab.se"
 
 
