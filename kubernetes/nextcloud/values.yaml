@@ -56,9 +56,9 @@ ingress:
   #    deny all;
   #  }
   tls:
-    - secretName: cloud-grupp3-dnlab-se-tls
+    - secretName: cloud2-grupp3-dnlab-se-tls
       hosts:
-        - cloud.grupp3.dnlab.se
+        - cloud2.grupp3.dnlab.se
   labels: {}
   path: /
   pathType: Prefix
@@ -76,7 +76,7 @@ phpClientHttpsFix:
 
 nextcloud:
   host: cloud.grupp3.dnlab.se
-  username:
+  username: admin-install
   password:
   ## Use an existing secret
   existingSecret:
@@ -108,7 +108,7 @@ nextcloud:
       secure: ssl
       port: 465
       authtype: LOGIN
-      name: svc-nextcloud
+      name: cloud@grupp3.dnlab.se
       password:
   ## Primary ObjectStore options
   # see: https://docs.nextcloud.com/server/latest/admin_manual/configuration_files/primary_storage.html#configuring-object-storage-as-primary-storage
@@ -419,7 +419,7 @@ mariadb:
   # see: https://github.com/bitnami/charts/tree/main/bitnami/mariadb#global-parameters
   global:
     # overwrites the primary.persistence.storageClass value
-    defaultStorageClass: "longhorn"
+    defaultStorageClass: "vsphere-block-sc"
 
   auth:
     database: nextcloud
@@ -439,9 +439,9 @@ mariadb:
       enabled: false
       # Use an existing Persistent Volume Claim (must be created ahead of time)
       existingClaim: ""
-      storageClass: "longhorn"
+      #storageClass: "longhorn"
       accessMode: ReadWriteOnce
-      size: 8Gi
+      #size: 8Gi
 
 ##
 ## PostgreSQL chart configuration
@@ -470,8 +470,10 @@ postgresql:
     persistence:
       enabled: true
       # Use an existing Persistent Volume Claim (must be created ahead of time)
-      # existingClaim: ""
-      storageClass: "longhorn"
+      #existingClaim: ""
+      storageClass: "vsphere-block-sc"
+      accessMode: ReadWriteOnce
+      size: 8Gi
 
 ##
 ## Redis chart configuration
@@ -489,7 +491,7 @@ redis:
     existingSecretPasswordKey: ""
   # Since Redis is used for caching only, you might want to use a storageClass with different reclaim policy and backup settings
   global:
-    storageClass: ""
+    #storageClass: ""
   master:
     persistence:
       enabled: true
@@ -605,12 +607,12 @@ persistence:
   ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
   ##   GKE, AWS & OpenStack)
   ##
-  storageClass: "longhorn"
+  storageClass: "vsphere-block-sc"
 
   ## A manually managed Persistent Volume and Claim
   ## Requires persistence.enabled: true
   ## If defined, PVC must be created manually before volume will be bound
-  # existingClaim:
+  #existingClaim: ""
 
   accessMode: ReadWriteOnce
   size: 8Gi
@@ -621,7 +623,7 @@ persistence:
     enabled: false
     subPath:
     annotations: {}
-    # storageClass: "-"
+    storageClass: ""
     # existingClaim:
     accessMode: ReadWriteOnce
     size: 8Gi
@@ -632,12 +634,12 @@ resources:
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #  cpu: 100m
-  #  memory: 128Mi
-  # requests:
-  #  cpu: 100m
-  #  memory: 128Mi
+  #limits:
+  #  cpu: "4000m"
+  #  memory: "8Gi"
+  #requests:
+  #  cpu: "3000m"
+  #  memory: "6Gi"
 
 ## Liveness and readiness probe values
 ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes
