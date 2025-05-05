@@ -56,9 +56,9 @@ ingress:
   #    deny all;
   #  }
   tls:
-    - secretName: cloud2-grupp3-dnlab-se-tls
+    - secretName: cloud-grupp3-dnlab-se-tls
       hosts:
-        - cloud2.grupp3.dnlab.se
+        - cloud.grupp3.dnlab.se
   labels: {}
   path: /
   pathType: Prefix

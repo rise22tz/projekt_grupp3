@@ -58,3 +58,7 @@ secret.yml
 
 values-secret.yaml
 values-secret.yml
+
+# ntp
+
+ansible/config/ntp

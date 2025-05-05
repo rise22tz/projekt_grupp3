@@ -1,0 +1,19 @@
+- name: Silvertejp NTP
+  hosts: ntp
+  become: true
+  gather_facts: false
+
+  tasks:
+
+    - name: Configure NTP
+      ansible.builtin.copy:
+        src: "../config/ntp/{{ hostvars[inventory_hostname]['script'] }}"
+        dest: "/opt/uptime"
+        mode: '0700'
+
+    - name: Create cron job for uptime script
+      ansible.builtin.cron:
+        name: "Run uptime script every minute"
+        minute: "*/1"
+        job: "/opt/uptime"
+        user: root

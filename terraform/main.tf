@@ -775,20 +775,20 @@ resource "vsphere_virtual_machine" "rancher" {
     }
   }
 }
-resource "vsphere_virtual_machine" "nfs" {
+resource "vsphere_virtual_machine" "ids" {
   count            = 1
-  name             = "nfs-${count.index + 1}"
+  name             = "ids-${count.index + 1}"
   resource_pool_id = data.vsphere_compute_cluster.cluster.resource_pool_id
   datastore_id     = count.index % 2 == 0 ? data.vsphere_datastore.datastore1.id : data.vsphere_datastore.datastore2.id
   folder           = vsphere_folder.mgmt.path
   num_cpus         = 2
   memory           = 4096
   network_interface {
-    network_id = data.vsphere_network.dmz.id
+    network_id = data.vsphere_network.mgmt.id
   }
   disk {
     label            = "Hard Disk 1"
-    size             = 50
+    size             = 16
     thin_provisioned = false
   }
 
@@ -797,9 +797,9 @@ resource "vsphere_virtual_machine" "nfs" {
   }
   vapp {
     properties = {
-      "hostname"    = "nfs-${count.index + 1}"
+      "hostname"    = "ids-${count.index + 1}"
       "public-keys" = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKCnq5ZGGA2Fa17jaWNrBdcvWfhVqUqi6xTksaXJSDvM"
-      "instance-id" = "nfs-${count.index + 1}"
+      "instance-id" = "ids-${count.index + 1}"
     }
   }
 
@@ -812,17 +812,17 @@ resource "vsphere_virtual_machine" "nfs" {
     customize {
 
       network_interface {
-        ipv4_address = "10.200.200.19${count.index + 1}"
+        ipv4_address = "10.200.100.9${count.index + 1}"
         ipv4_netmask = "24"
 
       }
 
-      ipv4_gateway    = "10.200.200.254"
+      ipv4_gateway    = "10.200.100.1"
       dns_server_list = ["10.200.50.11", "10.200.50.12"]
-      dns_suffix_list = ["grupp3.dnlab.se"]
+      dns_suffix_list = ["lan.grupp3.dnlab.se"]
 
       linux_options {
-        host_name = "nfs-${count.index + 1}"
+        host_name = "ids-${count.index + 1}"
         domain    = "grupp3.dnlab.se"
 
 
@@ -830,7 +830,61 @@ resource "vsphere_virtual_machine" "nfs" {
     }
   }
 }
+resource "vsphere_virtual_machine" "borg" {
+  count            = 1
+  name             = "borg-${count.index + 1}"
+  resource_pool_id = data.vsphere_compute_cluster.cluster.resource_pool_id
+  datastore_id     = count.index % 2 == 0 ? data.vsphere_datastore.datastore1.id : data.vsphere_datastore.datastore2.id
+  folder           = vsphere_folder.mgmt.path
+  num_cpus         = 2
+  memory           = 2048
+  network_interface {
+    network_id = data.vsphere_network.mgmt.id
+  }
+  disk {
+    label            = "Hard Disk 1"
+    size             = 80
+    thin_provisioned = false
+  }
 
+  cdrom {
+    client_device = true
+  }
+  vapp {
+    properties = {
+      "hostname"    = "borg-${count.index + 1}"
+      "public-keys" = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKCnq5ZGGA2Fa17jaWNrBdcvWfhVqUqi6xTksaXJSDvM"
+      "instance-id" = "borg-${count.index + 1}"
+    }
+  }
+
+  # Måste vara där
+  guest_id = "ubuntu64Guest"
+
+  clone {
+    # Referens till templaten som deklarerades tidigare
+    template_uuid = data.vsphere_virtual_machine.template.id
+    customize {
+
+      network_interface {
+        ipv4_address = "10.200.100.13${count.index + 1}"
+        ipv4_netmask = "24"
+
+      }
+
+      ipv4_gateway    = "10.200.100.1"
+      dns_server_list = ["10.200.50.11", "10.200.50.12"]
+      dns_suffix_list = ["lan.grupp3.dnlab.se"]
+
+      linux_options {
+        host_name = "borg-${count.index + 1}"
+        domain    = "lan.grupp3.dnlab.se"
+
+
+      }
+    }
+  }
+}
 locals {
   vm_groups = {
     vpn                  = vsphere_virtual_machine.vpn,
