@@ -105,7 +105,7 @@ mediawikiUser: admin
 ## Defaults to a random 10-character alphanumeric string if not set
 ## ref: https://github.com/bitnami/containers/tree/main/bitnami/mediawiki#environment-variables
 ##
-mediawikiPassword: "FZhwWXzr8ofCphMuQ7yHkOY0hVYnWnBx"
+mediawikiPassword: ""
 ## @param mediawikiSecret Existing `Secret` containing the password for the `mediawikiUser` user; must contain the key `mediawiki-password` and optional key `smtp-password`
 ## Mutually exclusive with `mediawikiPassword`
 ##
@@ -138,7 +138,7 @@ smtpHost: "mail.grupp3.dnlab.se"
 smtpPort: "465"
 smtpHostID: "mail.grupp3.dnlab.se"
 smtpUser: "wiki@grupp3.dnlab.se"
-smtpPassword: "iK6eGxgJPN8t5tzmqiAN7mCQ53u5XNDN"
+smtpPassword: ""
 ## @param command Override default container command (useful when using custom images)
 ##
 command: []
