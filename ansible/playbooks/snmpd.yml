@@ -10,6 +10,11 @@
         name: snmpd
         state: present
 
+    - name: Configure SNMPD
+      ansible.builtin.copy:
+        src: ../config/snmpd.conf
+        dest: /etc/snmp/snmpd.conf
+
     - name: Configure syslog
       ansible.builtin.copy:
         src: ../config/rsyslog.conf
@@ -18,4 +23,9 @@
     - name: Restart syslog
       ansible.builtin.service:
         name: rsyslog
+        state: restarted
+
+    - name: Restart SNMPD
+      ansible.builtin.service:
+        name: snmpd
         state: restarted
