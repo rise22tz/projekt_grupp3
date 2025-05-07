@@ -1,0 +1,21 @@
+- name: Install and configure SNMP
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Install required packages
+      ansible.builtin.apt:
+        update_cache: true
+        name: snmpd
+        state: present
+
+    - name: Configure syslog
+      ansible.builtin.copy:
+        src: ../config/rsyslog.conf
+        dest: /etc/rsyslog.conf
+
+    - name: Restart syslog
+      ansible.builtin.service:
+        name: rsyslog
+        state: restarted
