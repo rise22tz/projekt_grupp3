@@ -1,0 +1,13 @@
+- name: Install and configure Radius
+  hosts: ntp
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Install required packages
+      ansible.builtin.apt:
+        update_cache: true
+        name: libpam-radius-auth
+        state: present
+
+    - name: 
